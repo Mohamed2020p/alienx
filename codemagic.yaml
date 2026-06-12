@@ -8,26 +8,29 @@ workflows:
         script: |
           echo "Installing Mac system build tools..."
           brew install autoconf automake libtool pkg-config python@3.10
-          brew link --overwrite python@3.10
       - name: Set up Clean Kivy iOS Toolchain
         script: |
           echo "Setting up pristine Python and Kivy-ios environment..."
-          python3.10 -m pip install --upgrade pip setuptools virtualenv
-          python3.10 -m pip install Cython==0.29.33
-          python3.10 -m pip install kivy-ios
+          # إنشاء بيئة معزولة تماماً لضمان عدم التداخل مع بايثون السيرفر
+          python3.10 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip setuptools
+          pip install Cython==0.29.33
+          pip install kivy-ios
       - name: Compile Recipes & Create Project
         script: |
           echo "Compiling Python3 and Kivy for iOS architectures..."
-          # استخدام الأمر المباشر والمستقر لبناء الوصفات الأساسية معاً
-          toolchain build python3 kivy
+          source venv/bin/activate
+          
+          # إجبار التولشاين على بناء الحزم داخل البيئة المعزولة
+          venv/bin/toolchain build python3 kivy
           
           echo "Creating the Xcode project package..."
-          toolchain create AlienX $CM_BUILD_DIR
+          venv/bin/toolchain create AlienX $CM_BUILD_DIR
       - name: Package IPA
         script: |
           echo "Packaging into final unsigned IPA..."
           mkdir -p Payload
-          # نسخ المجلد البرمجي النهائي وتحويله لصيغة IPA جاهزة لـ Sideloadly
           cp -r $CM_BUILD_DIR/alienx-ios/*.xcodeproj/../build/Release-iphoneos/*.app Payload/ 2>/dev/null || mkdir -p Payload/AlienX.app
           zip -r AlienX.ipa Payload
     artifacts:
