@@ -5,15 +5,14 @@ workflows:
     instance_type: mac_mini_m1
 
     environment:
-      xcode: 16.2 # Fixed: Put xcode version in the correct environment block
+      xcode: 16.2
       vars:
         IPHONEOS_DEPLOYMENT_TARGET: "13.0"
-        CFLAGS: "-w"
-        CXXFLAGS: "-w"
+        MACOSX_DEPLOYMENT_TARGET: "14.0" # Higher compatibility for the host runtime on M1 Mac
+        CFLAGS: "-w -Wno-implicit-function-declaration"
+        CXXFLAGS: "-w -Wno-implicit-function-declaration"
         ARCHFLAGS: "-arch arm64"
         KIVY_IOS_ARCH: "arm64"
-        # Fixed: Removed XCODE_XCCONFIG_FILE entirely from here to avoid empty string validation errors.
-        # If the toolchain needs it empty, we can export it directly inside the script blocks.
 
     scripts:
       - name: Install System Dependencies
