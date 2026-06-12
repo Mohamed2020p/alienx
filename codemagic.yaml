@@ -1,0 +1,23 @@
+workflows:
+  ios-build:
+    name: AlienX iOS Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      python: 3.10
+    scripts:
+      - name: Install Dependencies
+        script: |
+          python -m pip install --upgrade pip
+          pip install kivy kivymd kivy-ios
+      - name: Toolchain Build
+        script: |
+          toolchain build kivy
+          toolchain create AlienX $CM_BUILD_DIR
+      - name: Package IPA
+        script: |
+          mkdir -p Payload
+          mv $CM_BUILD_DIR/alienx-ios/build/*.app Payload/ 2>/dev/null || mkdir Payload/AlienX.app
+          zip -r AlienX.ipa Payload
+    artifacts:
+      - AlienX.ipa
