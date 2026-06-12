@@ -17,8 +17,7 @@ workflows:
           pip install --upgrade pip setuptools wheel
           pip install Cython==0.29.33
           # kivy-ios 2.2.0 هو آخر إصدار مستقر ومتوافق مع Xcode الحديث
-          pip install kivy-ios==2.2.0
-
+          pip install kivy-ios==2024.3.17
       - name: Build Python3 Only
         script: |
           source venv/bin/activate
