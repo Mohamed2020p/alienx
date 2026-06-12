@@ -3,16 +3,17 @@ workflows:
     name: AlienX iOS Ultimate Build
     max_build_duration: 120
     instance_type: mac_mini_m1
-    xcode: 16.2 # Explicitly locked to stable Xcode 16.2 to prevent toolchain compilation failure
 
     environment:
+      xcode: 16.2 # Fixed: Put xcode version in the correct environment block
       vars:
         IPHONEOS_DEPLOYMENT_TARGET: "13.0"
         CFLAGS: "-w"
         CXXFLAGS: "-w"
         ARCHFLAGS: "-arch arm64"
         KIVY_IOS_ARCH: "arm64"
-        XCODE_XCCONFIG_FILE: ""
+        # Fixed: Removed XCODE_XCCONFIG_FILE entirely from here to avoid empty string validation errors.
+        # If the toolchain needs it empty, we can export it directly inside the script blocks.
 
     scripts:
       - name: Install System Dependencies
@@ -31,12 +32,14 @@ workflows:
       - name: Build Python3 Only
         script: |
           source venv/bin/activate
+          export XCODE_XCCONFIG_FILE=""
           venv/bin/toolchain clean
           venv/bin/toolchain build python3
 
       - name: Build SDL2 Only
         script: |
           source venv/bin/activate
+          export XCODE_XCCONFIG_FILE=""
           venv/bin/toolchain build sdl2
           venv/bin/toolchain build sdl2_image
           venv/bin/toolchain build sdl2_mixer
@@ -45,6 +48,7 @@ workflows:
       - name: Build Kivy Only
         script: |
           source venv/bin/activate
+          export XCODE_XCCONFIG_FILE=""
           venv/bin/toolchain build kivy
 
       - name: Build KivyMD and Python dependencies
