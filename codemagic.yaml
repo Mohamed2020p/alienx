@@ -3,12 +3,11 @@ workflows:
     name: AlienX iOS Build
     max_build_duration: 60
     instance_type: mac_mini_m1
-    environment:
-      python: 3.10
     scripts:
-      - name: Install Dependencies
+      - name: Set up Python & Install Dependencies
         script: |
-          python -m pip install --upgrade pip
+          echo "Installing Python and updates..."
+          python3 -m pip install --upgrade pip
           pip install kivy kivymd kivy-ios
       - name: Toolchain Build
         script: |
