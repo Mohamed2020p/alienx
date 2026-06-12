@@ -3,6 +3,7 @@ workflows:
     name: AlienX iOS Ultimate Build
     max_build_duration: 120
     instance_type: mac_mini_m1
+    xcode: 16.2
 
     scripts:
       - name: Install System Dependencies
