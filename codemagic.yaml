@@ -8,24 +8,31 @@ workflows:
         script: |
           echo "Installing Mac system build tools..."
           brew install autoconf automake libtool pkg-config python@3.10
-      - name: Set up Clean Kivy iOS Toolchain
+      - name: Set up Kivy iOS from GitHub (Latest Patches)
         script: |
-          echo "Setting up pristine Python and Kivy-ios environment..."
-          # إنشاء بيئة معزولة تماماً لضمان عدم التداخل مع بايثون السيرفر
+          echo "Setting up pristine environment with GitHub head version..."
           python3.10 -m venv venv
           source venv/bin/activate
-          pip install --upgrade pip setuptools
+          pip install --upgrade pip setuptools wheel
           pip install Cython==0.29.33
-          pip install kivy-ios
-      - name: Compile Recipes & Create Project
+          # السطر السحري: التثبيت مباشرة من المصدر لحل مشكلة الـ SDL مع Xcode
+          pip install git+https://github.com/kivy/kivy-ios.git
+      - name: Compile Recipes Sequentially
         script: |
-          echo "Compiling Python3 and Kivy for iOS architectures..."
+          echo "Compiling for iOS architectures..."
           source venv/bin/activate
           
-          # إجبار التولشاين على بناء الحزم داخل البيئة المعزولة
-          venv/bin/toolchain build python3 kivy
+          # إجبار النظام على منع فحص التوقيع أثناء بناء المكتبات الداخلية
+          export CODE_SIGNING_ALLOWED=NO
+          export CODE_SIGNING_REQUIRED=NO
           
-          echo "Creating the Xcode project package..."
+          echo "1. Forcing Python3 Build..."
+          venv/bin/toolchain build python3
+          
+          echo "2. Forcing Kivy & SDL Build..."
+          venv/bin/toolchain build kivy
+          
+          echo "3. Creating the Xcode project package..."
           venv/bin/toolchain create AlienX $CM_BUILD_DIR
       - name: Package IPA
         script: |
