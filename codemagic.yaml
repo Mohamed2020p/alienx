@@ -17,7 +17,8 @@ workflows:
           pip install kivy kivymd kivy-ios
       - name: Toolchain Build
         script: |
-          toolchain build kivy
+          echo "Building Python3 and Kivy for iOS..."
+          toolchain build python3 kivy
           toolchain create AlienX $CM_BUILD_DIR
       - name: Package IPA
         script: |
