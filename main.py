@@ -165,7 +165,7 @@ class AlienXPlayerApp(MDApp):
     def build(self):
         self.theme_cls.theme_style = "Dark"
         # رابط ملفك المباشر والذكي على استضافتك
-        self.M3U_URL = "http://manageilystore.rf.gd/main.m3u"
+        self.M3U_URL = "https://manageilystore.rf.gd/uploads/main.m3u"
         self.channels = []
         self.filtered_channels = []
         self.search_timer = None
