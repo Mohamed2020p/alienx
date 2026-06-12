@@ -3,7 +3,16 @@ workflows:
     name: AlienX iOS Ultimate Build
     max_build_duration: 120
     instance_type: mac_mini_m1
-    xcode: 16.2
+    xcode: 16.2 # Explicitly locked to stable Xcode 16.2 to prevent toolchain compilation failure
+
+    environment:
+      vars:
+        IPHONEOS_DEPLOYMENT_TARGET: "13.0"
+        CFLAGS: "-w"
+        CXXFLAGS: "-w"
+        ARCHFLAGS: "-arch arm64"
+        KIVY_IOS_ARCH: "arm64"
+        XCODE_XCCONFIG_FILE: ""
 
     scripts:
       - name: Install System Dependencies
@@ -17,32 +26,17 @@ workflows:
           source venv/bin/activate
           pip install --upgrade pip setuptools wheel
           pip install Cython==0.29.33
-          # 2025.5.17 هو الإصدار الوحيد المتوافق مع M1 + darwin25 + Xcode 26
           pip install kivy-ios==2025.5.17
 
       - name: Build Python3 Only
         script: |
           source venv/bin/activate
-          export IPHONEOS_DEPLOYMENT_TARGET=13.0
-          export XCODE_XCCONFIG_FILE=""
-          export CFLAGS="-w"
-          export CXXFLAGS="-w"
-          export ARCHFLAGS="-arch arm64"
-          export KIVY_IOS_ARCH="arm64"
-          # تنظيف كامل قبل البناء
           venv/bin/toolchain clean
           venv/bin/toolchain build python3
 
       - name: Build SDL2 Only
         script: |
           source venv/bin/activate
-          export IPHONEOS_DEPLOYMENT_TARGET=13.0
-          export XCODE_XCCONFIG_FILE=""
-          export CFLAGS="-w"
-          export CXXFLAGS="-w"
-          export ARCHFLAGS="-arch arm64"
-          export KIVY_IOS_ARCH="arm64"
-          # SDL2 لازم يتبنى منفصل قبل Kivy على Xcode 26
           venv/bin/toolchain build sdl2
           venv/bin/toolchain build sdl2_image
           venv/bin/toolchain build sdl2_mixer
@@ -51,29 +45,17 @@ workflows:
       - name: Build Kivy Only
         script: |
           source venv/bin/activate
-          export IPHONEOS_DEPLOYMENT_TARGET=13.0
-          export XCODE_XCCONFIG_FILE=""
-          export CFLAGS="-w"
-          export CXXFLAGS="-w"
-          export ARCHFLAGS="-arch arm64"
-          export KIVY_IOS_ARCH="arm64"
           venv/bin/toolchain build kivy
 
       - name: Build KivyMD and Python dependencies
         script: |
           source venv/bin/activate
-          export IPHONEOS_DEPLOYMENT_TARGET=13.0
-          export CFLAGS="-w"
-          export ARCHFLAGS="-arch arm64"
-          # مكتبات Python الضرورية للتطبيق
           venv/bin/toolchain pip install kivymd
           venv/bin/toolchain pip install requests
 
       - name: Create Xcode Project
         script: |
           source venv/bin/activate
-          export IPHONEOS_DEPLOYMENT_TARGET=13.0
-          export ARCHFLAGS="-arch arm64"
           venv/bin/toolchain create AlienX $CM_BUILD_DIR
 
       - name: Compile Xcode Project to APP
@@ -85,7 +67,6 @@ workflows:
             -configuration Release \
             -sdk iphoneos \
             -arch arm64 \
-            IPHONEOS_DEPLOYMENT_TARGET=13.0 \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
