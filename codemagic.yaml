@@ -8,9 +8,7 @@ workflows:
       xcode: 16.2
       vars:
         IPHONEOS_DEPLOYMENT_TARGET: "13.0"
-        MACOSX_DEPLOYMENT_TARGET: "14.0" # Higher compatibility for the host runtime on M1 Mac
-        CFLAGS: "-w -Wno-implicit-function-declaration"
-        CXXFLAGS: "-w -Wno-implicit-function-declaration"
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
         ARCHFLAGS: "-arch arm64"
         KIVY_IOS_ARCH: "arm64"
 
@@ -33,12 +31,19 @@ workflows:
           source venv/bin/activate
           export XCODE_XCCONFIG_FILE=""
           venv/bin/toolchain clean
+          
+          # حقن الـ Flags مباشرة هنا قبل الـ build عشان الـ recipe غصب عنه يشوفها
+          export CFLAGS="-w -Wno-implicit-function-declaration"
+          export CXXFLAGS="-w -Wno-implicit-function-declaration"
+          
           venv/bin/toolchain build python3
 
       - name: Build SDL2 Only
         script: |
           source venv/bin/activate
           export XCODE_XCCONFIG_FILE=""
+          export CFLAGS="-w -Wno-implicit-function-declaration"
+          export CXXFLAGS="-w -Wno-implicit-function-declaration"
           venv/bin/toolchain build sdl2
           venv/bin/toolchain build sdl2_image
           venv/bin/toolchain build sdl2_mixer
@@ -48,6 +53,8 @@ workflows:
         script: |
           source venv/bin/activate
           export XCODE_XCCONFIG_FILE=""
+          export CFLAGS="-w -Wno-implicit-function-declaration"
+          export CXXFLAGS="-w -Wno-implicit-function-declaration"
           venv/bin/toolchain build kivy
 
       - name: Build KivyMD and Python dependencies
