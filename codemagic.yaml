@@ -14,11 +14,14 @@ workflows:
           echo "Installing Python dependencies..."
           python3 -m pip install --upgrade pip
           pip install Cython==3.0.11
-          pip install kivy kivymd kivy-ios
-      - name: Toolchain Build
+          pip install "kivy[base]" kivymd
+          pip install --force-reinstall kivy-ios
+      - name: Toolchain Build & Clean
         script: |
-          echo "Building Python3 and Kivy for iOS..."
-          toolchain build python3 kivy
+          echo "Forcing clean and rebuilding Python3 and Kivy for iOS..."
+          toolchain clean
+          toolchain build python3
+          toolchain build kivy
           toolchain create AlienX $CM_BUILD_DIR
       - name: Package IPA
         script: |
